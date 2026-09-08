@@ -1,78 +1,56 @@
 # MKEM Link
 
-**Post-Quantum Secure Communication**
+**Post-Quantum Secure Communication — Research Prototype**
 
-MKEM Link is a research-oriented secure communication prototype using **ML-KEM-768** for post-quantum key establishment and **AES-256-GCM** for authenticated encrypted messaging.
+MKEM Link explores the architecture of a post-quantum secure communication channel using **ML-KEM-768** for post-quantum key establishment, **HKDF-SHA-256** for session-key derivation, and **AES-256-GCM** for authenticated encrypted messaging.
 
-> **Research prototype:** This project has not been independently audited and is not intended for production security use.
+## Browser experience
+
+The repository now includes a responsive `index.html` experience designed for desktop, phone, and iPad. Publish the repository with GitHub Pages to get a public browser link.
+
+> **Important:** The current browser experience is an interactive protocol demonstration. It visualizes the secure-channel flow and message UI, but it does not yet connect two real remote peers. It must not be represented as an audited or production-secure messenger.
 
 ## Architecture
 
 ```text
-Client                                  Host
-  |                                      |
-  | <-------- ML-KEM public key -------- |
-  |                                      |
-  |  ML-KEM encapsulation                |
-  |  -> shared secret                    |
-  |                                      |
-  | -------- KEM ciphertext -----------> |
-  |                         decapsulation |
-  |                         -> same secret|
-  |                                      |
-  |       HKDF-SHA-256 on both sides     |
-  |                 |                    |
-  |           AES-256 session key        |
-  |                 |                    |
-  | <==== AES-256-GCM messages ========> |
+Peer A                              Peer B
+  |                                  |
+  | <----- ML-KEM material --------> |
+  |                                  |
+  |       shared keying material     |
+  |                 |                |
+  |          HKDF-SHA-256            |
+  |                 |                |
+  |        AES-256 session key       |
+  |                 |                |
+  | <=== AES-256-GCM messages ====>  |
 ```
 
-ML-KEM does **not** encrypt chat messages directly. It establishes shared keying material. HKDF-SHA-256 derives the session key, and AES-256-GCM provides authenticated message encryption.
+ML-KEM does **not** encrypt chat messages directly. It establishes shared keying material. HKDF derives a session key, while AES-256-GCM provides authenticated message encryption.
 
-## Features
+## Research roadmap
 
-- Clean desktop interface
-- Host and client modes
-- ML-KEM-768 key generation, encapsulation and decapsulation
-- HKDF-SHA-256 session-key derivation
-- AES-256-GCM authenticated encryption
-- Length-prefixed TCP message framing
-- Fresh random 96-bit GCM nonces
-- Localhost and LAN research demonstrations
+1. Interactive browser protocol demo
+2. Real networked peer transport
+3. Endpoint identity authentication and transcript binding
+4. Replay/ordering protection and secure session lifecycle
+5. Classical, ML-KEM and hybrid key-establishment modes
+6. ML-KEM-512/768/1024 benchmarking
+7. Latency, CPU, memory and bandwidth evaluation
+8. Controlled privacy-preserving transport experiments
+9. Formal threat-model and protocol analysis
 
-## Run
-
-Requires Python 3.11+.
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python app.py
-```
-
-On Windows, activate with `.venv\Scripts\activate`.
-
-For a local demonstration, run two instances. Choose **Host** in one instance and **Start Chat** in the other, connecting to `127.0.0.1` on port `8000`.
-
-## Research Roadmap
-
-1. Baseline ML-KEM-768 + AES-256-GCM secure channel
-2. Endpoint identity authentication and handshake transcript binding
-3. Replay/ordering protection and secure session lifecycle
-4. Classical, ML-KEM and hybrid key-establishment modes
-5. ML-KEM-512/768/1024 benchmarking
-6. Latency, CPU, memory and bandwidth evaluation
-7. Controlled privacy-preserving transport experiments
-8. Formal threat-model and protocol analysis
-
-## Research Questions
+## Research questions
 
 - What deployment overhead does ML-KEM introduce compared with classical key establishment?
 - How does hybrid key establishment affect latency and bandwidth?
 - How do higher-latency privacy-preserving transports affect post-quantum handshakes?
-- Which protocol mechanisms are required around a KEM to construct a robust secure channel?
+- Which mechanisms are required around a KEM to construct a robust authenticated secure channel?
+
+## Security status
+
+Research software. Not independently audited. Do not use the current prototype to protect sensitive or production communications.
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+MIT License. See `LICENSE`.
